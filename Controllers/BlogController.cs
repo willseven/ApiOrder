@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApiWeb_master.Data;
+using ApiWeb_master.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -23,12 +25,12 @@ namespace TodoApi.Controllers
             _context = context;
         }
 
-        [HttpGet("todo")]
+        [HttpGet]
         public async Task<IEnumerable<Blog>> Gets()
         {
             return await _context.Blogs.ToListAsync();
         }
-        [HttpGet]
+        [HttpGet("one")]
         public Blog Get()
         {
             Console.WriteLine("Querying for a blog");
@@ -62,7 +64,7 @@ namespace TodoApi.Controllers
         [HttpDelete]
         public Blog Delete(Blog newBlog)
         {
-             var deleteBlog = new Blog { BlogId = newBlog.BlogId };
+            var deleteBlog = new Blog { BlogId = newBlog.BlogId };
             // Delete
             Console.WriteLine("Inserting a new blog");
             _context.Remove(deleteBlog);
@@ -84,60 +86,61 @@ namespace TodoApi.Controllers
         public Blog Update(Blog newBlog)
         {
             var blog = _context.Blogs
-                .SingleOrDefault(b=>b.BlogId == newBlog.BlogId);
+                .SingleOrDefault(b => b.BlogId == newBlog.BlogId);
 
             blog.Url = newBlog.Url;
             // blog.Posts.Add(
             //         new Post
             //         {
-                        
+
             //             BlogId =  newBlog.BlogId,
             //             Title = "Hello World",
             //             Content = "I wrote an app using EF Core!"
-                        
+
             //         });
-            var createPost = new Post { 
-                        BlogId =  newBlog.BlogId,
-                        Title = "Hello World",
-                        Content = "I wrote an app using EF Core!"
+            var createPost = new Post
+            {
+                BlogId = newBlog.BlogId,
+                Title = "Hello World",
+                Content = "I wrote an app using EF Core!"
             };
             Console.WriteLine("updating blog");
             _context.Update(blog);
             _context.SaveChanges();
             return blog;
         }
-        
+
         //METHOD PUT CON ENVIO DE ID EN LA URL
         private bool TodoItemExists(int id) =>
      _context.Blogs.Any(e => e.BlogId == id);
 
         [HttpPut("{id}")]
-public async Task<IActionResult> UpdateTodoItem(int id, Blog Blog)
-{
-    if (id != Blog.BlogId)
-    {
-        return BadRequest();
-    }
+        public async Task<IActionResult> UpdateTodoItem(int id, Blog Blog)
+        {
+            if (id != Blog.BlogId)
+            {
+                return BadRequest();
+            }
 
-    var todoItem = await _context.Blogs.FindAsync(id);
-    if (todoItem == null)
-    {
-        return NotFound();
-    }
+            var todoItem = await _context.Blogs.FindAsync(id);
+            if (todoItem == null)
+            {
+                return NotFound();
+            }
 
-    todoItem.Url = Blog.Url;
+            todoItem.Url = Blog.Url;
 
-    try
-    {
-        await _context.SaveChangesAsync();
-    }
-    catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
-    {
-        return NotFound();
-    }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
+            {
+                return NotFound();
+            }
 
-    return NoContent();
-}
+            return NoContent();
+        }
 
     }
 }
