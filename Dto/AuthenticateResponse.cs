@@ -1,6 +1,7 @@
-using WebApi.Entities;
 
-namespace WebApi.Models
+
+namespace ApiWeb_master.Models
+
 {
     public class AuthenticateResponse
     {
